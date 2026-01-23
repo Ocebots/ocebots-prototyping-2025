@@ -8,6 +8,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.LimelightHelpers;
 import frc.robot.config.TurretConfig;
 
@@ -40,20 +41,51 @@ public class Turret extends SubsystemBase {
 
     final PositionVoltage m_request = new PositionVoltage(0);
 
+    boolean flipping = false;
+
     public void moveToApriltag() {
-        if (LimelightHelpers.getTV("limelight")) {
+        if (LimelightHelpers.getTV("limelight") && !flipping) {
             double currentPosition = mTurretRotation.getPosition().getValueAsDouble();
             double tx = LimelightHelpers.getTX("limelight");
             double errorInRotations = (tx / 360.0) * TurretConfig.K_ROTATION_GEAR_RATIO;
             double targetPositon = currentPosition + errorInRotations;
             mTurretRotation.setControl(m_request.withPosition(targetPositon));
-        } 
+
+        }
+    }
+
+    public void flip() {
+        if (mTurretRotation.getPosition().getValueAsDouble() >= 1.7) {
+            flipping = true;
+            stopMotors();
+            mTurretRotation.setControl(m_request.withPosition(-0.8));
+            new WaitCommand(2);
+            flipping = false;
+
+        }
+        if (mTurretRotation.getPosition().getValueAsDouble() <= -1) {
+            flipping = true;
+            stopMotors();
+            mTurretRotation.setControl(m_request.withPosition(1.4));
+            new WaitCommand(2);
+            flipping = false;
+        }
+    }
+
+    public boolean shouldFlip() {
+        if (mTurretRotation.getPosition().getValueAsDouble() >= 1.7 || mTurretRotation.getPosition().getValueAsDouble() <= -1) {
+            return true;
+        }
         else {
-            mTurretRotation.setControl(new NeutralOut());
+            return false;
         }
     }
 
     public void zeroTurret() {
         mTurretRotation.setPosition(0);
+    }
+
+    public void stopMotors() {
+        mTurretRotation.stopMotor();
     }
 }

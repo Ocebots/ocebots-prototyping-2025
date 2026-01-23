@@ -36,7 +36,7 @@ public class RobotContainer {
   }
   
   private void configureBindings() {
-    controller.a().onTrue(Commands.run(() -> turret.moveToApriltag(), turret));
+    controller.a().onTrue(Commands.run(() -> turret.moveToApriltag(), turret).until(() -> turret.shouldFlip()).andThen(Commands.runOnce(() -> turret.stopMotors(), turret).andThen(Commands.runOnce(() -> turret.flip(), turret))));
   }
 
   /**
