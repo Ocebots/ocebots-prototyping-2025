@@ -46,7 +46,7 @@ public class Turret extends SubsystemBase {
     public void moveToApriltag() {
         if (LimelightHelpers.getTV("limelight") && !flipping) {
             double currentPosition = mTurretRotation.getPosition().getValueAsDouble();
-            double tx = LimelightHelpers.getTX("limelight");
+            double tx = -LimelightHelpers.getTX("limelight");
             double errorInRotations = (tx / 360.0) * TurretConfig.K_ROTATION_GEAR_RATIO;
             double targetPositon = currentPosition + errorInRotations;
             mTurretRotation.setControl(m_request.withPosition(targetPositon));
@@ -55,25 +55,25 @@ public class Turret extends SubsystemBase {
     }
 
     public void flip() {
-        if (mTurretRotation.getPosition().getValueAsDouble() >= 1.7) {
+        if (mTurretRotation.getPosition().getValueAsDouble() >= 2) {
             flipping = true;
             stopMotors();
-            mTurretRotation.setControl(m_request.withPosition(-0.8));
+            mTurretRotation.setControl(m_request.withPosition(-1.9));
             new WaitCommand(2);
             flipping = false;
 
         }
-        if (mTurretRotation.getPosition().getValueAsDouble() <= -1) {
+        if (mTurretRotation.getPosition().getValueAsDouble() <= -2) {
             flipping = true;
             stopMotors();
-            mTurretRotation.setControl(m_request.withPosition(1.4));
+            mTurretRotation.setControl(m_request.withPosition(1.9));
             new WaitCommand(2);
             flipping = false;
         }
     }
 
     public boolean shouldFlip() {
-        if (mTurretRotation.getPosition().getValueAsDouble() >= 1.7 || mTurretRotation.getPosition().getValueAsDouble() <= -1) {
+        if (mTurretRotation.getPosition().getValueAsDouble() >= 2 || mTurretRotation.getPosition().getValueAsDouble() <= -2) {
             return true;
         }
         else {
