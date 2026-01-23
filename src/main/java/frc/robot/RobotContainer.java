@@ -28,16 +28,21 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   private Turret turret = new Turret();
   private CommandXboxController controller = new CommandXboxController(0);
+  boolean turretAgain = false;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
   }
-  
-  private void configureBindings() {
-    controller.a().onTrue(Commands.run(() -> turret.moveToApriltag(), turret).until(() -> turret.shouldFlip()).andThen(Commands.runOnce(() -> turret.stopMotors(), turret).andThen(Commands.runOnce(() -> turret.flip(), turret))));
+  private Command TurretFlip(){
+    return (Commands.run(() -> turret.moveToApriltag(), turret).until(() -> turret.shouldFlip()).andThen(Commands.runOnce(() -> turret.stopMotors(), turret).andThen(Commands.runOnce(() -> turret.flip(), turret)))).andThen(Commands.waitSeconds(0.5)).repeatedly();
   }
+  private void configureBindings() {
+    controller.a().onTrue(TurretFlip());
+
+  }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
